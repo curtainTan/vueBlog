@@ -14,13 +14,13 @@
                         <div class="down">
                             <span>{{item.time}}</span>
                             <span><Icon type="md-eye" />浏览量：{{item.click_num}}</span>
-                            <span>#作者：{{item.user_name}}</span>
+                            <span>#作者：<router-link :to="{ path : '/user/' + item.user_name }">{{item.user_name}}</router-link></span>
                         </div>
                     </div>
                 </div>
             </Card>
         </div>
-        <Page :total="num" :current="pageNum" @on-change = "pageChange" :page-size="pageSize" />
+        <Page v-if="num > 5" :total="num" :current="pageNum" @on-change = "pageChange" :page-size="pageSize" />
         <Spin size="large" fix v-if="spinShow" ></Spin>
     </div>
 </template>
@@ -47,15 +47,15 @@ export default {
         initList( path, page ){
             this.spinShow = true
             this.$api.article.getArticleList( path, page ).then( res => {
-                this.num = res.data.result.count
-                this.list = res.data.result.rows
+                console.log('此处是主页的数据')
+                console.log(res)
+                this.num = res.data.count
+                this.list = res.data.result
                 this.spinShow = false
             })
         },
         setArticle(val){
-            this.getArticle(val).then( res => {
-                this.$router.push({ name : 'articleById', params : { id : val } })
-            } )
+            this.$router.push({ name : 'articleById', params : { id : val } })
         }
     },
     mounted() {

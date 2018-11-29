@@ -4,10 +4,10 @@
 import axios from '../http.js'
 // import axios from 'axios'
 //域名设置
-const host = 'http://localhost:3000/article'
+// const host = 'http://localhost:3000/article'
 
 
-// const host = 'http://www.curtaintan.club/article'
+const host = 'http://www.curtaintan.club/article'
 
 
 const article = {
@@ -24,7 +24,7 @@ const article = {
         if( !page ){
             page = 1
         }
-        return axios.get( `${host}/getArticleByUser/` + user + '/' + page + '/' + caogao )
+        return axios.get( `${host}/getArticleByUser/` + user + '/' + page  + '/' + caogao)
     },
     //获取文章列表
     getArticleList( label, page ){
@@ -44,6 +44,18 @@ const article = {
     //更新文章
     updateArt( params ){
         return axios.post( `${host}/updateArt`, params )
+    },
+    //发表评论
+    postDiscuss( params ){
+        return axios.post( `${host}/postDis`, params )
+    },
+    //评论分页
+    disPage( params ){
+        return axios.get( `${host}/discuss/${params.id}/${params.page}`)
+    },
+    //喜欢文章
+    like( params ){
+        return axios.post( `${host}/like`, params )
     }
 }
 

@@ -311,6 +311,7 @@ export default {
             hasValue,
             title: '',
             content: '正文......',
+            originArt : {},
             customModulesForEditor: [
                 { alias: 'imageResize', module: ImageResize },
             ],
@@ -329,17 +330,25 @@ export default {
         }
     },
     computed: {
-        ...mapGetters([ 'getisUpdate', 'getArticleOne' ])
+        ...mapGetters([ 'getArticleId' ])
     },
     mounted() {
-        if(this.getisUpdate){
-            this.content = this.getArticleOne.content
-            this.title = this.getArticleOne.title
-            this.model1 = this.getArticleOne.label
+        if(this.getArticleId > 0 ){
+            this.$api.article.getArticle( this.getArticleId ).then( res => {
+                console.log('-------------------修改的文章----------------------')
+                console.log( res )
+                this.content = res.data.result.content
+                this.title = res.data.result.title
+                this.model1 = res.data.result.label
+                this.originArt = res.data.result
+            } )
+            //  = this.getArticleOne.content
+            //  = this.getArticleOne.title
+            // this.model1 = this.getArticleOne.label
         }
     },
     methods:{
-        ...mapActions([ 'upArticle', 'setIsUpdate', 'updateArt' ]),
+        ...mapActions([ 'upArticle', 'setArticleId', 'updateArt' ]),
         handleImageAdded: function(file, Editor, cursorLocation, resetUploader) {
         if(file.size > 1024*1024*2){
             new ImageCompressor(file,{
@@ -402,15 +411,15 @@ export default {
             var ss = this.verify()
             if(ss){
                 //判断是否是重新编辑文章
-                if( this.getisUpdate ){
+                if( this.getArticleId ){
                     var formData = {
-                        id : this.getArticleOne.id,
+                        id : this.originArt.id,
                         title : this.title,
                         content : this.content,
                         caogao : 1,
                         label : this.model1
                     }
-                    this.updateArt(formData).then( res => {
+                    this.updateArt(formData).then( res => { 
                         if( res.data.success ){
                             this.$Message.info({
                                     content : "保存成功.....",
@@ -418,7 +427,8 @@ export default {
                                 })
                                 this.title = '',
                                 this.content = "正文......"
-                                this.setIsUpdate( false )
+                                var artId = -4
+                                this.setArticleId( artId )
                                 return true
                             }else{
                                 return false
@@ -452,28 +462,27 @@ export default {
             var ss = this.verify()
             if(ss){
                 //判断是否是重新编辑文章
-                if( this.getisUpdate ){
-                    if( this.getisUpdate ){
-                        var formData = {
-                            id : this.getArticleOne.id,
-                            title : this.title,
-                            content : this.content,
-                            caogao : 0,
-                            label : this.model1
-                        }
-                        console.log('此处要发送请求')
-                        this.updateArt(formData).then( res => {
-                            if( res.data.success ){
-                                this.$Message.info({
-                                        content : "保存成功.....",
-                                        duration: 5,
-                                    })
-                                    this.title = '',
-                                    this.content = "正文......"
-                                    this.setIsUpdate( false )
-                                }
-                        })
+                if( this.getArticleId > 0 ){
+                    var formData = {
+                        id : this.originArt.id,
+                        title : this.title,
+                        content : this.content,
+                        caogao : 0,
+                        label : this.model1
                     }
+                    console.log('此处要发送请求')
+                    this.updateArt(formData).then( res => {
+                        if( res.data.success ){
+                            this.$Message.info({
+                                    content : "保存成功.....",
+                                    duration: 5,
+                                })
+                                this.title = '',
+                                this.content = "正文......"
+                                var artId = -4
+                                this.setArticleId( artId )
+                            }
+                    })
                 }else{
                     var formData = {
                         user : this.$store.state.state.userInfo.username,
@@ -498,8 +507,9 @@ export default {
       }
     },
     beforeRouteLeave (to, from, next) {
-        if( (this.title === this.getArticleOne.title) && (this.model1 === this.getArticleOne.label) && (this.content === this.getArticleOne.content) ){
-            this.setIsUpdate(false)
+        if( (this.title === this.originArt.title) && (this.model1 === this.originArt.label) && (this.content === this.originArt.content) ){
+            var artId = -4
+            this.setArticleId( artId )
             next()
         }else{
             if( this.title !== "" ){
@@ -507,13 +517,10 @@ export default {
                     title: '你即将离开编辑页面...',
                     content: '<p>是否放弃修改？？？</p>',
                     onOk: () => {
-                        // if( this.caogao() ){
-                        //     this.setIsUpdate(false)
-                        //     next()
-                        // }
-                        this.setIsUpdate(false)
                         this.title = '',
                         this.content = "正文......"
+                        var artId = -4
+                        this.setArticleId( artId )
                         next()
                     },
                     onCancel: () => {

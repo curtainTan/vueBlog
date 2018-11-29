@@ -16,12 +16,10 @@ export const LOGOUT = 'logOut'
 export const UPHEADIMG = 'upHeadimg'
 
 
-export const SET_ARTICLE = 'set_article'
+export const SET_ARTICLE_ID = 'set_article_status'
 
-export const SET_ARTICLE_SATUS = 'set_article_status'
 
-export const SET_ISUPDATE_SATUS = 'set_isupdate_status'
-
+export const SET_LIKE_LIST = 'set_like_list'
 
 
 

@@ -47,6 +47,9 @@ const errorHandle = (status, other) => {
         case 404:
             tip('请求的资源不存在'); 
             break;
+        case 413:
+            tip('图片过大。。。。。。。。'); 
+            break;
         default:
             console.log(other);   
         }}

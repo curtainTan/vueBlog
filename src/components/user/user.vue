@@ -3,12 +3,12 @@
         <div class="left">
             <div class="top">
                 <div class="headimg">
-                    <img :src="$store.state.state.userInfo.headImg" alt="">
+                    <img :src="one.headImg" alt="">
                 </div>
                 <div class="main">
-                    <h3>{{$store.state.state.userInfo.username}}</h3>
+                    <h3>{{one.username}}</h3>
                     <p>个性签名：</p>
-                    <div class="mainDown">
+                    <div class="mainDown" v-if="getUserInfo.username === $route.params.username " >
                         <ButtonGroup>
                             <Button type="primary" ghost @click="tomy">编辑个人资料</Button>
                             <Button type="primary"  @click="out" >退出登录</Button>
@@ -17,12 +17,12 @@
                 </div>
             </div>
             <div class="nav">
-                <Tabs :value="$route.path" @on-click="qwe">
-                    <TabPane label="动态" name="/user" ></TabPane>
-                    <TabPane label="喜欢" name="/user/xihuan" ></TabPane>
-                    <TabPane label="回答" name="/user/huida" ></TabPane>
-                    <TabPane label="文章" name="/user/wenzhang" ></TabPane>
-                    <TabPane label="设置" name="/user/my" ></TabPane>
+                <Tabs :value="$route.name" @on-click="qwe">
+                    <TabPane label="动态" name="user-dongtai" ></TabPane>
+                    <TabPane label="喜欢" name="user-xihuan" ></TabPane>
+                    <TabPane label="回答" name="user-huida" ></TabPane>
+                    <TabPane label="文章" name="user-wenzhang" ></TabPane>
+                    <TabPane v-if="getUserInfo.username === $route.params.username " label="设置" name="user-my" ></TabPane>
                 </Tabs>
             </div>
             <div class="content">
@@ -43,57 +43,149 @@
                     <h3>56</h3>
                 </div>
             </div>
-            <div class="rightDown">
-                <Collapse>
-                    <Panel name="1">
-                        关注的文件<span>23</span>
-                        <p slot="content">史蒂夫·乔布斯（Steve Jobs），1955年2月24日生于美国加利福尼亚州旧金山，美国发明家、企业家、美国苹果公司联合创办人。</p>
-                    </Panel>
-                    <Panel name="2">
-                        关注的问题<span>23</span>
-                        <p slot="content">斯蒂夫·盖瑞·沃兹尼亚克（Stephen Gary Wozniak），美国电脑工程师，曾与史蒂夫·乔布斯合伙创立苹果电脑（今之苹果公司）。斯蒂夫·盖瑞·沃兹尼亚克曾就读于美国科罗拉多大学，后转学入美国著名高等学府加州大学伯克利分校（UC Berkeley）并获得电机工程及计算机（EECS）本科学位（1987年）。</p>
-                    </Panel>
-                    <Panel name="3">
-                        关注的话题<span>23</span>
-                        <p slot="content">乔纳森·伊夫是一位工业设计师，现任Apple公司设计师兼资深副总裁，英国爵士。他曾参与设计了iPod，iMac，iPhone，iPad等众多苹果产品。除了乔布斯，他是对苹果那些著名的产品最有影响力的人。</p>
-                    </Panel>
-                </Collapse>
+            <div class="rightDown" v-if="getUserInfo.username === $route.params.username ">
+                <Divider />
+                <div class="item">
+                    <span>设置背景图片</span>
+                    <Upload 
+                        action="http://www.curtaintan.club/auth/setBg"
+                        :format="format"
+                        name="bg"
+                        :data="dat"
+                        :max-size="4096"
+                        :on-success="fileSuc"
+                        :on-exceeded-size="handleMaxSize"
+                        :show-upload-list="showFile"
+                        :on-format-error="handleFormatError">
+                        <Button type="primary" shape="circle" icon="ios-cloud-upload-outline">设置</Button>
+                    </Upload>
+                </div>
+                <Divider />
+                <div class="defaultImg">
+                    <img src="http://www.curtaintan.club/bg/1.jpg" alt="">
+                    <div class="mask">
+                        <Spin fix v-if="bgShow" ></Spin>
+                        <h3 v-else @click="showSpin(1)" >设置为背景图片</h3>
+                    </div>
+                </div>
+                <Divider />
+                <div class="defaultImg">
+                    <img src="http://www.curtaintan.club/bg/4.jpg" alt="">
+                    <div class="mask">
+                        <Spin fix v-if="bgShow" ></Spin>
+                        <h3 v-else @click="showSpin(2)" >设置为背景图片</h3>
+                    </div>
+                </div>
+                <Divider />
             </div>
         </Affix>
     </div>
 </template>
 
 <script>
-import shangchuan from './shangchuan.vue'
-import { mapActions } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 
 export default {
     data(){
         return{
-            // value: '/user'
+            file: null,
+            format : ['jpg','jpeg','png','gif'],
+            dat : {},
+            showFile : false,
+            bgShow : false,
+            one : {}
         }
     },
-    components: {
-        shangchuan
+    computed: {
+        ...mapGetters( ['getUserInfo'] )
+    },
+    watch: {
+        $route( to, from ){
+            console.log( '------------------------个人中心路由检测----------------------------')
+            console.log( to )
+            if( to.params.username === this.getUserInfo.username ){
+                this.one = this.getUserInfo
+            }
+        }
+    },
+    mounted() {
+        console.log( '-----------------组件创建-------------------' )
+        console.log( this.getUserInfo )
+        if( this.$route.params.username  === this.getUserInfo.username ){
+            this.one = this.getUserInfo
+            console.log('----------------------我自己----------------------')
+            console.log( this.one )
+            this.dat = {
+                user : this.getUserInfo.username
+            }
+        }else{
+            //发送请求获取其他用户的信息
+            var ss = {
+                user : this.$route.params.username
+            }
+            console.log( '----------------其他用户初始化---------------------' )
+            this.$api.users.getOne( ss ).then( res => {
+                console.log( res )
+                this.one.headImg = res.data.headImg
+                this.one.username = res.data.user_name
+                console.log( this.one )
+            } )
+        }
+    },
+    beforeUpdate() {
+        console.log('-------------------数据更新了----------------------')
     },
     methods: {
         ...mapActions([ 'logOut' ]),
         qwe( tan ){
-            this.$router.push(tan)
+            this.$router.push({ name : tan })
         },
         tomy(){
             this.$router.push('/user/my')
-            // this.value = '/user/my'
-            // console.log(this.$route.path)
         },
         out(){
             this.logOut().then( res => {
                 this.$router.push('/')
+                let app = document.getElementById('app')
+                app.style.backgroundImage = `url("")`
                 this.$Message.info({
                     content: '已经退出.....',
                     duration: 3
                 });
             })
+        },
+        handleFormatError (file) {
+            this.$Notice.warning({
+                title: '提示',
+                desc: '文件 ' + file.name + ':文件类型错误，请上传jpg，png，gif格式的图片。'
+            });
+        },
+        handleMaxSize( file ){
+            this.$Notice.warning({
+                title: '提示',
+                desc: '文件 ' + file.name + '过大，请上传4M下的图片。'
+            });
+        },
+        fileSuc( res ){
+            console.log( '-=-----------上传成功-------------------' )
+            let app = document.getElementById( 'app')
+            app.style.backgroundImage = `url("${res.bgImg}")`
+        },
+        showSpin( index ){
+            console.log( index )
+            this.bgShow = true
+            setTimeout( () => {
+                this.bgShow = false
+            }, 2000 )
+            var sendData = {
+                user : this.getUserInfo.username,
+                num : index
+            }
+            this.$api.users.setDefBg( sendData ).then( res => {
+                console.log( '-------------------设置默认图片----------------------' )
+                console.log( res )
+                this.fileSuc( res.data )
+            } )
         }
     }
 }
@@ -157,7 +249,6 @@ export default {
     line-height: 40px;
 }
 .user .left .nav{
-    background-color: #ffffff;
     margin-top: 20px;
     border-radius: 4px;
     box-shadow: 1px 1px 4px rgb(165, 165, 165);
@@ -165,7 +256,6 @@ export default {
 .user .left .content{
     min-height: 400px;
     border-radius: 5px;
-    background-color: #ffffff;
     margin-top: 20px;
     border-radius: 4px;
     box-shadow: 1px 1px 4px rgb(165, 165, 165);
@@ -197,6 +287,50 @@ export default {
     border-right: none;
     text-align: left;
 }
+.user .right .rightDown .item{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.user .right .rightDown .item button{
+    margin-right: 6px;
+}
+.user .right .rightDown .defaultImg{
+    text-align: center;
+    margin: 10px auto; 
+    position: relative;
+    width: 205px;
+    overflow: hidden;
+}
+.user .right .rightDown .defaultImg img{
+    width: 100%;
+    transition: all .8s;
+}
+.user .right .rightDown .defaultImg:hover img{
+    transform: scale(1.2, 1.2);
+}
+.user .right .rightDown .defaultImg:hover .mask{
+    transform: translateY(-120px);
+}
+.user .right .rightDown .defaultImg .mask{
+    position: absolute;
+    bottom: -120px;
+    height: 120px;
+    width: 100%;
+    background-color: rgba(128, 128, 128, 0.5);
+    transition: all .4s ease-out;
+}
+.user .right .rightDown .defaultImg .mask h3{
+    line-height: 115px;
+    cursor: pointer;
+}
+.user .right .rightDown .defaultImg .mask .ivu-spin{
+    height: 130px;
+    width: 100%;
+}
+/* .user .right .rightDown .defaultImg .mask .ivu-spin-fix{
+    background-color: rgba(238, 238, 238, 0.5);
+} */
 </style>
 <style>
 .user .left .nav .ivu-tabs .ivu-tabs-bar{
@@ -221,6 +355,14 @@ export default {
 .user .right .rightDown .ivu-collapse .ivu-collapse-item .ivu-collapse-header span{
     float: right;
     padding-right: 30px;
+}
+.user .right .rightDown .item .ivu-upload{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.user .right .rightDown .ivu-divider-horizontal{
+    margin: 10px 0px;
 }
 </style>
 

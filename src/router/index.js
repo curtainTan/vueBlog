@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import home from '@/components/home/home'
+// import home from '@/components/home/home'
 import store from '../store'
 
 Vue.use(Router)
@@ -9,9 +9,18 @@ const router = new Router({
   // mode: 'history',
   routes: [
     {
+        path: '/about',
+        component : () => import('@/components/about/about'),
+        children : [
+            {
+                path : '',
+                component : () => import('@/components/about/main'),
+            }
+        ]
+    },
+    {
       path: '/',
-      name: 'mhome',
-      component: home,
+      component: () => import('@/components/home/home'),
       children: [
         {
           path: 'article/:id',
@@ -19,10 +28,10 @@ const router = new Router({
           component : () => import('@/components/article/article'),
           meta : { title : '文章' }
         },
-        {
-          path: 'chart',
-          component : () => import('@/components/chart/chart'),
-        },
+        // {
+        //   path: 'chart',
+        //   component : () => import('@/components/chart/chart'),
+        // },
         {
           path : '',
           name: 'one',
@@ -47,31 +56,32 @@ const router = new Router({
           meta : { title: '个人中心', requireLogin: true },
         },
         {
-          path : 'user',
+          path : 'user/:username',
           component : () => import('@/components/user/user'),
           children: [
             {
               path : '',
-              component : () => import('@/components/user/dongtai'),
-              meta : { title: '个人中心', requireLogin: true },
+              name : 'user-dongtai',
+              component : () => import('@/components/user/dongtai')
             },
             {
               path: 'xihuan',
-              component :  () => import('@/components/user/dongtai'),
-              meta : { title: '个人中心', requireLogin: true },
+              name : 'user-xihuan',
+              component :  () => import('@/components/user/like')
             },
             {
               path: 'huida',
-              component : () => import('@/components/user/huida'),
-              meta : { title: '个人中心', requireLogin: true },
+              name : 'user-huida',
+              component : () => import('@/components/user/huida')
             },
             {
               path: 'wenzhang',
-              component :  () => import('@/components/user/shangchuan'),
-              meta : { title: '个人中心', requireLogin: true },
+              name : 'user-wenzhang',
+              component :  () => import('@/components/user/shangchuan')
             },
             {
               path: 'my',
+              name : 'user-my',
               component :  () => import('@/components/user/my'),
               meta : { title: '个人中心', requireLogin: true },
             },
@@ -104,30 +114,6 @@ router.beforeEach( (to, from ,next) => {
     next()
   }
 })
-
-
-
-
-
-// const article = r => require.ensure([], () => r(require('@/components/article/article')), 'article')
-// const chart = r => require.ensure([], () => r(require('@/components/chart/chart')), 'chart')
-// const news = r => require.ensure([], () => r(require('@/components/home/news')), 'news')
-// const css = r => require.ensure([], () => r(require('@/components/home/css')), 'css')
-// const js = r => require.ensure([], () => r(require('@/components/home/js')), 'js')
-// const discuss = r => require.ensure([], () => r(require('@/components/home/discuss')), 'discuss')
-// const editor = r => require.ensure([], () => r(require('@/components/home/editor')), 'editor')
-
-
-
-
-// const dongtai = r => require.ensure([], () => r(require('@/components/user/dongtai')), 'dongtai')
-// const huida = r => require.ensure([], () => r(require('@/components/user/huida')), 'huida')
-// const shangchuan = r => require.ensure([], () => r(require('@/components/user/shangchuan')), 'shangchuan')
-// const my = r => require.ensure([], () => r(require('@/components/user/my')), 'my')
-
-
-
-
 
 
 

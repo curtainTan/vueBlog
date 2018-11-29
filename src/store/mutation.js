@@ -9,9 +9,8 @@ import {
     UPDATA_USERINFO,
     LOGOUT,
     UPHEADIMG,
-    SET_ARTICLE,
-    SET_ARTICLE_SATUS,
-    SET_ISUPDATE_SATUS
+    SET_ARTICLE_ID,
+    SET_LIKE_LIST
 } from './mutation-type'
 
 
@@ -32,6 +31,8 @@ export default {
         state.state.userInfo.work = userInfo.work
         state.state.userInfo.introduce = userInfo.introduce
         state.state.userInfo.headImg = userInfo.headImg
+        state.state.userInfo.likeList = userInfo.likeList
+        state.state.userInfo.bgImg = userInfo.bgImg
     },
     [UPDATA_USERINFO] ( state, { userInfo } ){
         state.state.userInfo.work = userInfo.work
@@ -49,15 +50,13 @@ export default {
     [UPHEADIMG] ( state, { payload } ){
         state.state.userInfo.headImg = payload
     },
-    [SET_ARTICLE]( state, { data } ){
-        state.state.article = data
+    [SET_ARTICLE_ID]( state, { id } ){
+        state.state.articleId = id
     },
-    [SET_ARTICLE_SATUS]( state, { status } ){
-        state.state.articleStatus = status
+    [SET_LIKE_LIST]( state, { payload } ){
+        state.state.userInfo.likeList = payload
     },
-    [SET_ISUPDATE_SATUS]( state, { status } ){
-        state.state.isUpdate = status
-    }
+
 }
 
 

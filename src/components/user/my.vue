@@ -14,6 +14,11 @@
         </div>
         <Divider />
         <div class="item">
+            <span>城市</span>
+            <input v-model="work" placeholder="Enter something..." />
+        </div>
+        <Divider />
+        <div class="item">
             <span>人介绍</span>
             <Input class="geren" v-model="introduce" type="textarea" :rows="4" placeholder="Enter something..." />
         </div>
@@ -44,6 +49,7 @@ export default {
             width: 200,
             height: 200,
             uploadUrl: 'http://www.curtaintan.club/auth/headImg',
+            // uploadUrl: 'http://localhost:3000/auth/headImg',
             fileName: 'headImg', 
             userData: {
                 user : this.$store.state.state.userInfo.username,
@@ -100,7 +106,7 @@ export default {
                 });
             }
         }
-    }
+    },
 }
 </script>
 
@@ -110,6 +116,7 @@ export default {
 }
 .tan .headImg{
     width: 80px;
+    height: 80px;
     border-radius: 10px;
     margin-right: 50px;
 }

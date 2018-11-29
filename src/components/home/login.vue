@@ -114,6 +114,14 @@ export default {
         var token = window.localStorage.getItem('token')
         if(token){
             this.autoLogin(token).then( res => {
+                console.log( '------------------自动登录------------------------' )
+                console.log( res )
+                if( res.data.bgImg ){
+                    let app = document.getElementById('app')
+                    app.style.backgroundImage = `url("${res.data.bgImg}")`
+                }else{
+                    console.log('------------------------没有背景图片-----------------------------')
+                }
             })
         }
     },
@@ -144,6 +152,12 @@ export default {
                 }
                 this.login( fordata ).then(res=>{
                     if( res.success ){
+                        if( res.bgImg ){
+                            let app = document.getElementById('app')
+                            app.style.backgroundImage = `url("${res.bgImg}")`
+                        }else{
+                            console.log('------------------------没有背景图片-----------------------------')
+                        }
                         this.modal_loading = false;
                         this.$Message.info({
                             content : '登录成功....',

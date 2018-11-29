@@ -15,11 +15,11 @@
                             <ButtonGroup size="small">
                                 <Button><Icon type="ios-pricetags-outline" size='20' />{{item.label}}</Button>
                                 <Button><Icon type="ios-eye" size='20' />{{item.click_num||0}}</Button>
-                                <Button><Icon type="ios-text-outline"  size='20'/>{{item.comment||0}}</Button>
-                                <Button><Icon type="ios-heart-outline" size='20' />{{item.like_num||0}}</Button>
+                                <Button><Icon type="ios-text-outline"  size='20'/>{{item.disNum||0}}</Button>
+                                <Button><Icon type="ios-heart-outline" size='20' />{{item.likenum||0}}</Button>
                             </ButtonGroup>
                             <span>发表于：{{item.time}}</span>
-                            <Poptip placement="bottom">
+                            <Poptip placement="bottom"  v-if="getUserInfo.username === $route.params.username " >
                                 <a><Icon type="ios-more" size='30' color="#ff9900" /></a>
                                 <div slot="content" class="handle">
                                     <a  @click="toEditor(item.id) " ><Icon type="md-color-wand"size='25'/></a>
@@ -34,7 +34,7 @@
             <div v-else class="empty">
                 <div class="kong">
                     <div class="tu"></div>
-                    <p>还没有文章，开始  <router-link style="color: green" to="/e">写一篇文章</router-link> </p>
+                    <p>还没有文章，开始  <router-link style="color: green" to="/editor">写一篇文章</router-link> </p>
                 </div>
             </div>
         </div>
@@ -57,20 +57,21 @@ export default {
         }
     },
     computed : {
-        ...mapGetters([ 'getUserName' ])
+        ...mapGetters([ 'getUserName', 'getUserInfo' ])
     },
     methods: {
-        ...mapActions([ 'getArticle','autoLogin', 'deleteArt','setIsUpdate' ]),
+        ...mapActions([ 'autoLogin', 'deleteArt','setArticleId' ]),
         pageChange( val ){
             this.initList( val )
         },
         initList( page ){
             this.nowPage = page
-            var user = this.getUserName
+            var user = this.$route.params.username
             var caogao = this.caogao
             this.$api.article.getArticleByUser(  user,page,caogao ).then( res => {
-                this.num = res.data.result.count
-                this.list = res.data.result.rows
+                console.log( res )
+                this.num = res.data.count
+                this.list = res.data.result
             })
         },
         setArticle(val){
@@ -80,9 +81,7 @@ export default {
                     content: '<p>草稿不能还没发布暂时不能查看</p>'
                 });
             }else{
-                this.getArticle(val).then( res => {
-                    this.$router.push({ name : 'articleById', params : { id : val } })
-                })
+                this.$router.push({ name : 'articleById', params : { id : val } })
             }
         },
         showDelete( id ){
@@ -100,10 +99,8 @@ export default {
             });
         },
         toEditor(id){
-            this.setIsUpdate( true )
-            this.getArticle(id).then( res => {
-                    this.$router.push({ name : 'editor' })
-                })
+            this.setArticleId( id )
+            this.$router.push({ name : 'editor' })
         },
         getArticleList(){
             this.caogao = 0
@@ -115,16 +112,16 @@ export default {
         }
     },
     mounted() {
-        var token = window.localStorage.getItem('token')
-        if( this.getUserName === '' ){
-            if(token){
-                this.autoLogin(token).then( res => {
-                    this.initList( 1 )
-                })
-            }
-        }else{
+        // var token = window.localStorage.getItem('token')
+        // if( this.getUserName === '' ){
+        //     if(token){
+        //         this.autoLogin(token).then( res => {
+        //             this.initList( 1 )
+        //         })
+        //     }
+        // }else{
              this.initList( 1 )
-        }
+        // }
     },
 }
 </script>

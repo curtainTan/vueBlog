@@ -8,14 +8,12 @@ import 'iview/dist/styles/iview.css'
 import './assets/style.css'
 import store from './store/index'
 import allapi from './api/modul/index'
-import Vchart from 'v-charts'
 
 
 
 
 Vue.prototype.$api = allapi
 Vue.use(iview)
-Vue.use(Vchart)
 Vue.config.productionTip = false
 
 /* eslint-disable no-new */

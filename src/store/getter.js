@@ -16,14 +16,8 @@ const getHeadImg = state => {
     return state.state.userInfo.headImg
 }
 
-const getArticleOne = state => {
-    return state.state.article
-}
-const getArticleStatus = state => {
-    return state.state.articleStatus
-}
-const getisUpdate = state => {
-    return state.state.isUpdate
+const getArticleId = state => {
+    return state.state.articleId
 }
 
 
@@ -36,9 +30,7 @@ export default ({
     getUserInfo,
     getUserName,
     getHeadImg,
-    getArticleOne,
-    getArticleStatus,
-    getisUpdate
+    getArticleId
 })
 
 

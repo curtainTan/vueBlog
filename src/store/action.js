@@ -11,9 +11,8 @@ import {
     UPDATA_USERINFO,
     LOGOUT,
     UPHEADIMG,
-    SET_ARTICLE,
-    SET_ARTICLE_SATUS,
-    SET_ISUPDATE_SATUS
+    SET_ARTICLE_ID,
+    SET_LIKE_LIST
 } from './mutation-type'
 
 
@@ -57,8 +56,6 @@ export default {
             allapi.users.login( payload ).then((result) =>{
                 if(result.data.success){     //登录成功
                     var userInfo = result.data
-                    // console.log("此处是登录")
-                    // console.log(userInfo)
                     res(result.data)
                     commit( AUTO_USERINFO, { userInfo } )
                     commit( SET_TOKEN, { userInfo } )
@@ -122,22 +119,7 @@ export default {
         })
         return aa
     },
-
-    //获取一片文章的所有信息到vuex保存
-    getArticle( {commit}, payload ){
-        var status = true
-        commit( SET_ARTICLE_SATUS, {status} )
-        var aa = new Promise( (res, rej) => {
-            allapi.article.getArticle(payload).then( result => {
-                var data = result.data.result
-                console.log('此处是获取文章')
-                console.log(result)
-                res( result )
-                commit( SET_ARTICLE, { data } )
-            })
-        })
-        return aa
-    },
+    //删除一篇文章
     deleteArt( {commit}, payload ){
         var aa = new Promise( (res, rej) => {
             allapi.article.deleteArt(payload).then( result => {
@@ -147,10 +129,10 @@ export default {
         return aa
     },
 
-
-    setIsUpdate( {commit}, status ){
-        console.log(status)
-        commit( SET_ISUPDATE_SATUS, { status } )
+    //设置编辑文章的id
+    setArticleId( {commit}, id ){
+        console.log( id )
+        commit( SET_ARTICLE_ID, { id } )
     },
 
     //更新文章
@@ -161,6 +143,10 @@ export default {
             })
         })
         return aa
+    },
+    //设置喜欢列表
+    setLikeList( {commit}, payload ){
+        commit( SET_LIKE_LIST, { payload } )
     }
 
 

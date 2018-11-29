@@ -28,19 +28,17 @@
                     <div class="right">
                         <login v-if="!state.userInfo.username" />
                         <div class="userImg" v-else >
-                            <a @click="toUser" class="touxiang"><img width="35px" :src="this.getHeadImg||'http://i2.hdslb.com/bfs/face/ea61f3ace77785b5820a50522d54a257a54e498b.jpg'" alt=""></a>
-                            <Badge :count="$store.state.state.userInfo.msg" ><a href=""><Icon type="ios-notifications-outline" size="26"/></a></Badge>
+                            <router-link :to="{ path : '/user/' + getUserInfo.username }" class="touxiang"><img :src="getUserInfo.headImg" alt=""></router-link>
+                            <Badge :count="$store.state.state.userInfo.msg" ><Icon type="ios-notifications-outline" size="26"/></Badge>
                         </div>
                     </div>
                 </div>
             </div>
         </Affix>
         <div class="down">
-            <!-- <keep-alive> -->
-                <router-view />
-            <!-- </keep-alive> -->
-            <div class="footer"></div>
+            <router-view />
         </div>
+        <div class="footer"></div>
     </div>
 </template>
 
@@ -58,7 +56,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters([ 'getHeadImg' ]),
+        ...mapGetters([ 'getUserInfo' ]),
         ...mapState([ 'state' ])
     },
     components: {
@@ -68,9 +66,6 @@ export default {
         select(s){
             this.$router.push(s)
         },
-        toUser(){
-            this.$router.push('/user')
-        }
     },
     watch: {
         // '$route'( to, from ){
@@ -88,15 +83,19 @@ export default {
     background-color: rgb(255, 255, 255);
     z-index: 999;
 }
+.homeHeader .left{
+    overflow: auto;
+}
 .down{
     max-width: 960px;
     margin: 0 auto;
     margin-top: 40px;
-    min-height: 400px;
+    min-height: 80vh;
     text-align: left;
     border-radius: 5px;
-    background-color: rgb(255, 255, 255);
+    background-color: rgba(255, 255, 255, .8);
     box-shadow: 2px 2px 3px hsla(0,0%,4%,.1);
+    transition: all 1s;
 }
 .header{
     max-width: 960px;
@@ -113,12 +112,16 @@ export default {
     overflow: hidden;
     margin-right: 10px;
 }
-.userImg .头像 img{
+/* .userImg .touxiang img{
     width: 35px;
-}
+    height: 35px;
+} */
 .right .userImg{
     display: flex;
     align-items: center;
+}
+.right .userImg span{
+    cursor: pointer;
 }
 .footer{
     height: 200px;
@@ -127,6 +130,10 @@ export default {
 <style>
 .header .ivu-menu-horizontal.ivu-menu-light::after{
     height: 0!important;
+}
+.touxiang img{
+    width: 35px;
+    height: 35px;
 }
 </style>
 
