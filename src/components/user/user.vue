@@ -93,7 +93,9 @@ export default {
             dat : {},
             showFile : false,
             bgShow : false,
-            one : {}
+            one : {
+                headImg : "12345"
+            }
         }
     },
     computed: {
@@ -109,12 +111,9 @@ export default {
         }
     },
     mounted() {
-        console.log( '-----------------组件创建-------------------' )
         console.log( this.getUserInfo )
         if( this.$route.params.username  === this.getUserInfo.username ){
             this.one = this.getUserInfo
-            console.log('----------------------我自己----------------------')
-            console.log( this.one )
             this.dat = {
                 user : this.getUserInfo.username
             }
@@ -123,17 +122,11 @@ export default {
             var ss = {
                 user : this.$route.params.username
             }
-            console.log( '----------------其他用户初始化---------------------' )
             this.$api.users.getOne( ss ).then( res => {
-                console.log( res )
                 this.one.headImg = res.data.headImg
                 this.one.username = res.data.user_name
-                console.log( this.one )
             } )
         }
-    },
-    beforeUpdate() {
-        console.log('-------------------数据更新了----------------------')
     },
     methods: {
         ...mapActions([ 'logOut' ]),

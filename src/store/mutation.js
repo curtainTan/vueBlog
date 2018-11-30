@@ -22,6 +22,8 @@ export default {
         state.state.userInfo.msg = ''
         state.state.userInfo.work = ''
         state.state.userInfo.introduce = ''
+        state.state.userInfo.likeList = []
+        state.state.userInfo.headImg = ''
     },
     [AUTO_USERINFO] ( state, { userInfo } ){
         state.state.userInfo.username = userInfo.user_name

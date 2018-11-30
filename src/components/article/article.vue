@@ -110,20 +110,29 @@ export default {
             } )
         },
         like(){
-            this.loading = true
-            let data = {
-                user : this.getUserInfo.username,
-                id : this.$route.params.id
+            if( this.getUserInfo.username ){
+                this.loading = true
+                let data = {
+                    user : this.getUserInfo.username,
+                    id : this.$route.params.id
+                }
+                this.$api.article.like( data ).then( res => {
+                    console.log('-------------喜欢---------------------')
+                    console.log( res )
+                    this.setLikeList( res.data.result )
+                    setTimeout( () => {
+                        this.loading = false
+                        this.likeNum = res.data.like
+                    }, 500 )
+                })
+            }else{
+                this.$Notice.open({
+                    title: '温馨提示',
+                    desc: '只有登录后，才能发表评论.',
+                    duration: 3
+                });
+                this.show()
             }
-            this.$api.article.like( data ).then( res => {
-                console.log('-------------喜欢---------------------')
-                console.log( res )
-                this.setLikeList( res.data.result )
-                setTimeout( () => {
-                    this.loading = false
-                    this.likeNum = res.data.like
-                }, 500 )
-            })
         }
     },
     mounted() {
