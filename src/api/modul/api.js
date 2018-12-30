@@ -1,6 +1,5 @@
 
 import axios from '../http.js'
-import { getAllLike } from '../../../../server/lib/mysql.js';
 // import axios from 'axios'
 //域名设置
 // const host = 'http://localhost:3000/auth'

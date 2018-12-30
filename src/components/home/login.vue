@@ -11,7 +11,7 @@
                                 </Input>
                             </FormItem>
                             <FormItem prop="password">
-                                <Input type="password" size="large" v-model="formInline.psw" placeholder="Password">
+                                <Input type="password" size="large" v-model="formInline.password" placeholder="Password">
                                     <Icon type="ios-lock-outline" slot="prepend"></Icon>
                                 </Input>
                             </FormItem>
@@ -24,8 +24,8 @@
                                     <Icon type="ios-person-outline" slot="prepend"></Icon>
                                 </Input>
                             </FormItem>
-                            <FormItem prop="password">
-                                <Input type="password" size="large" v-model="loginData.psw" placeholder="Password">
+                            <FormItem prop="password1">
+                                <Input type="password" size="large" v-model="loginData.password1" placeholder="Password">
                                     <Icon type="ios-lock-outline" slot="prepend"></Icon>
                                 </Input>
                             </FormItem>
@@ -52,23 +52,27 @@ export default {
             if (value === '') {
                 callback(new Error('请输入你的密码...'));
                 } else {
-                    if (this.login.psw !== '') {
+                    var yanzheng  = /^[a-z0-9]{6,16}$/
+                    if( yanzheng.test( value ) ){
                         // 对第二个密码框单独验证
-                    this.$refs.loginData.validateField('passwdCheck');
+                        this.$refs.loginData.validateField('passwdCheck');
+                        callback()
+                    }else{
+                        callback(new Error('请输入至少6位密码....'));
+                    }
                 }
-                callback();
-            }
         };
         const validatePassCheck = (rule, value, callback) => {
             if (value === '') {
                 callback(new Error('请再次输入你的密码....'));
-            } else if (value !== this.loginData.psw) {
-               callback(new Error('与密码不匹配.....'));
-            } else if ( value === this.loginData.user ){
-                callback(new Error('密码不能与用户名相同.....'));
-            } else {
-                callback();
             }
+            if (value !== this.loginData.password1) {
+               callback(new Error('与密码不匹配.....'));
+            }
+            if ( value === this.loginData.user ){
+                callback(new Error('密码不能与用户名相同.....'));
+            }
+            callback();
         };
         return {
             value: '',
@@ -76,36 +80,35 @@ export default {
             logUrl: '1',   //1代表登录  2代表注册
             formInline: {
                 user: '',
-                psw: ''
+                password: ''
             },
             ruleInline: {
                 user: [
                     { required: true, message: '请输入用户名', trigger: 'blur' },
-                    { required: true, message: '用户名必须由数字或字母组成', pattern: /^[a-z0-9]+$/, trigger: 'blur' },
+                    { required: true, message: '用户名必须由数字或字母组成且长度不小于3', pattern: /^[a-z0-9]{3,16}$/, trigger: 'blur' },
                 ],
-                 psw: [
+                password: [
                     { required: true, message: '请输入密码.', trigger: 'blur' },
-                    { type: 'string', min: 6, message: '请输入不少于6位的密码...', trigger: 'blur' },
-                    { type: 'string', min: 6,  pattern: /^[a-z0-9]+$/, message: '密码必须由数字和字母组成...', trigger: 'blur' }
+                    { required: true, pattern: /^[a-z0-9]{6,16}$/, message: '密码必须由数字和字母组成且长度不小于6...', trigger: 'change' }
                 ]
             },
             loginData: {
                 user: '',
-                psw: '',
+                password1: '',
                 passwdCheck: ''
             },
             ruleInlog: {
                 user: [
                     { required: true, message: '请输入用户名', trigger: 'blur' },
-                    { required: true, message: '用户名必须由数字或字母组成', pattern: /^[a-z0-9]+$/, trigger: 'blur' }
+                    {  message: '用户名必须由数字或字母组成且长度不小于3', pattern: /^[a-z0-9]{3,16}$/, trigger: 'blur' }
                 ],
-                psw: [
-                    { type: 'string', min: 6, message: '请输入不少于6位的密码...', trigger: 'blur' },
-                    { type: 'string', min: 6,  pattern: /^[a-z0-9]+$/, message: '密码必须由数字和字母组成...', trigger: 'blur' },
-                    { validator: validatePass, trigger: 'blur' }
+                password1: [
+                    // { required: true, type: 'string', min: 6, message: '请输入不少于6位的密码...', trigger: 'blur' },
+                    // { required: true, pattern: /^[a-z0-9]{6,16}$/, message: '密码必须由数字和字母组成...', trigger: 'blur' },
+                    { required: true, validator: validatePass, trigger: 'change' }
                 ],
                 passwdCheck: [
-                    { validator: validatePassCheck, trigger: 'blur' }
+                    { required: true, validator: validatePassCheck, trigger: 'change' }
                 ]
             }
         }
@@ -114,8 +117,6 @@ export default {
         var token = window.localStorage.getItem('token')
         if(token){
             this.autoLogin(token).then( res => {
-                console.log( '------------------自动登录------------------------' )
-                console.log( res )
                 if( res.data.bgImg ){
                     let app = document.getElementById('app')
                     app.style.backgroundImage = `url("${res.data.bgImg}")`
@@ -128,11 +129,6 @@ export default {
     computed: {
         ...mapGetters(['showLogin'])
     },
-    watch: {
-        showLogin1(o,n){
-            console.log(n,o)
-        }
-    },
     methods: {
         ...mapActions([ 'hide', 'show', 'login', 'register', 'autoLogin' ]),
         ...mapMutations([ 'RECIVE_USERINFO' ]),
@@ -144,55 +140,67 @@ export default {
             return
         },
         submi () {
-            this.modal_loading = true;
             if(this.logUrl === '1'){
-                var fordata = {
-                    user: this.formInline.user,
-                    psw: this.formInline.psw
-                }
-                this.login( fordata ).then(res=>{
-                    if( res.success ){
-                        if( res.bgImg ){
-                            let app = document.getElementById('app')
-                            app.style.backgroundImage = `url("${res.bgImg}")`
-                        }else{
-                            console.log('------------------------没有背景图片-----------------------------')
+                this.$refs.formInline.validate( valid => {
+                    if( valid ){
+                        var fordata = {
+                            user: this.formInline.user,
+                            psw: this.formInline.password
                         }
-                        this.modal_loading = false;
-                        this.$Message.info({
-                            content : '登录成功....',
-                            duration: 5,
-                        });
-                        this.hide()
-                    }else{
-                        this.modal_loading = false;
-                        this.$Message.info({
-                            content : res.info,
-                            duration: 5,
-                        });
+                        console.log( fordata )
+                        this.modal_loading = true;
+                        this.login( fordata ).then(res=>{
+                            if( res.success ){
+                                if( res.bgImg ){
+                                    let app = document.getElementById('app')
+                                    app.style.backgroundImage = `url("${res.bgImg}")`
+                                }else{
+                                    console.log('------------------------没有背景图片-----------------------------')
+                                }
+                                this.modal_loading = false;
+                                this.$Message.info({
+                                    content : '登录成功....',
+                                    duration: 5,
+                                });
+                                this.hide()
+                            }else{
+                                this.modal_loading = false;
+                                this.$Message.info({
+                                    content : res.info,
+                                    duration: 5,
+                                });
+                            }
+                        })
                     }
-                })
+                } )
             }else{
-                var fordata = {
-                    user: this.loginData.user,
-                    psw: this.loginData.psw
-                }
-                this.register( fordata ).then(res=>{
-                    console.log(res.data)
-                    if(res.data.success){
-                        this.modal_loading = false;
-                        this.$Message.success({
-                            content: '注册成功.....',
-                            duration: 3
-                        });
-                        this.$refs.loginData.resetFields()
-                        this.loginData.psw = ''
-                    }else{
-                        this.modal_loading = false;
-                        this.$Message.success(res.data.info);
+                this.$refs.loginData.validate( valid => {
+                    if( valid ){
+                        console.log('-------------valid-----------------------')
+                        console.log( valid )
+                        this.modal_loading = true;
+                        var fordata = {
+                            user: this.loginData.user,
+                            psw: this.loginData.password1
+                        }
+                        console.log( fordata )
+                        this.register( fordata ).then(res=>{
+                            console.log(res.data)
+                            if(res.data.success){
+                                this.modal_loading = false;
+                                this.$Message.success({
+                                    content: '注册成功.....',
+                                    duration: 3
+                                });
+                                this.$refs.loginData.resetFields()
+                                this.loginData.psw = ''
+                            }else{
+                                this.modal_loading = false;
+                                this.$Message.success(res.data.info);
+                            }
+                        })
                     }
                 })
-                    
             }
         },
     }
@@ -206,7 +214,7 @@ export default {
 
 
 <style>
-.ivu-tabs-tabpane{
+.right .ivu-tabs-tabpane{
     display: flex; 
     align-items: center;
     width: 100%;
