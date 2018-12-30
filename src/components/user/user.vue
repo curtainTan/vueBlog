@@ -134,7 +134,7 @@ export default {
             this.$router.push({ name : tan })
         },
         tomy(){
-            this.$router.push('/user/my')
+            this.$router.push({ name : "user-my" })
         },
         out(){
             this.logOut().then( res => {

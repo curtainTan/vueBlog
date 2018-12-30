@@ -18,8 +18,11 @@ npm run build
 npm run build --report
 ```
 
+使用七牛云作为图床，体验时好时坏，这里有两个版本
 
-项目地址：http://www.curtaintan.club/dist1/index.html#/
+项目地址：
+        七牛前：http://www.curtaintan.club/dist/index.html#/
+        七牛后：http://www.curtaintan.club/dist1/index.html#/
 
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
